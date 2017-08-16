@@ -4,7 +4,6 @@ var restify = require('restify');
 var http = require('http');
 
 //Variables necesarias para poder realizar la conexion a MongoDB
-var mongo = require('mongodb');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/restify";
 
@@ -80,13 +79,15 @@ function getImagen(req,res,next){
   next();
 }
 
+//Creacion del servidor
 var server = restify.createServer();
 
+//Plugin para poder leer el paquete del body
 server.use(restify.plugins.bodyParser());
 
 
 
-
+//Rutas para acceder a las funciones
 server.get('/consultar',getImagen);
 server.post('/insertar',postImagen);
 
