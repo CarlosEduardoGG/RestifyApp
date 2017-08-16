@@ -2,8 +2,10 @@
 var restify = require('restify');
 //Variable para conseguir el get de la base de datos
 var http = require('http');
+//var https = require('https');
 
 //Variables necesarias para poder realizar la conexion a MongoDB
+var mongo = require('mongodb');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/restify";
 
@@ -54,36 +56,51 @@ function postImagen(req,res,next){
 
     today = dd + '/' + mm + '/' + yyyy;
 
-    var myobj = { imagen: req.body.imagen, created:today };
+    console.log("body:"+req.body);
+    imagenBD=req.body.imagen+"";
+
+    var myobj = { imagen: imagenBD, created:today };
     db.collection("imagenes").insertOne(myobj, function(err, res) {
       if (err){
+        //res.send(500,"Error al insertar");
         throw err;
       }
 
       console.log("1 document inserted");
+      console.log(myobj);
+      //res.send(200,"Archivo insertado");
       db.close();
     });
   });
+
+  res.send(200);
+
+  next();
 }
 
 function getImagen(req,res,next){
   MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection("imagenes").find({}).toArray(function(err, result) {
     if (err) throw err;
-    db.collection("customers").findOne({}, function(err, result) {
-      if (err) throw err;
-      console.log(result);
-      db.close();
-    });
+    console.log(result);
+    res.send(result);
+    db.close();
   });
+});
+
+  next();
 }
 
 var server = restify.createServer();
 
+server.use(restify.plugins.bodyParser());
 
 
 
-server.get('/paquete',getImagen);
-server.post('/paquete',postImagen);
+
+server.get('/consultar',getImagen);
+server.post('/insertar',postImagen);
 
 server.listen(8080, function() {
   console.log('%s listening at %s', server.name, server.url);
