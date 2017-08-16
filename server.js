@@ -57,18 +57,26 @@ function postImagen(req,res,next){
   res.send(200);
   next();
 }
-
+/**
+funcion getImagen en la cual se obtienen todas las tuplas(documentos) de la
+coleccion de MongoDB
+*/
 function getImagen(req,res,next){
+  //Conexion a Mongo
   MongoClient.connect(url, function(err, db) {
+  //Condicion para entrar a Mongo
   if (err) throw err;
+  //Se consiguen todos los documentos de la coleccion de imagenes con find
   db.collection("imagenes").find({}).toArray(function(err, result) {
+    //Condicion en caso de error
     if (err) throw err;
+    //Si todo procede bien se imprime en consola el resultado
     console.log(result);
+    //Se guarda en el paquete de respuesta el resultado
     res.send(result);
-    db.close();
+    db.close();//Cierre de la conexion
   });
 });
-
   next();
 }
 
